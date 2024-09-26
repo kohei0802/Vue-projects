@@ -3,11 +3,25 @@
     home
     <p ref="p">My name is {{ name }} and my age is {{ age }}</p>
     <button @click="handleClick">Click me</button>
+    <button @click="age++">Add 1 to age</button>
+    <input type="text" v-model="name">
+
+    <h2>Reactive</h2>
+    <p>{{ ninjaTwo.name }} - {{ ninjaTwo.age }}</p>
+    <button @click="updateNinjaTwo">Update Ninja Two</button>
+    <!-- <p>Company name: {{ company }}</p> -->
+
+    <input type="text" v-model="search">
+    <p>search term - {{ search }}</p>
+    <div v-for="company in matchingCompanies" :key="company">
+      {{ company }}
+    </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+// Both ref and reactive can be used to make reactive values 
+import { ref, reactive, computed, watch, watchEffect } from 'vue';
 
 
 export default {
@@ -27,6 +41,14 @@ export default {
     let name=ref('mario')
     let age=ref(30)
 
+    // WARNING: can't work on primitive values like string
+    let ninjaTwo = reactive({name: 'luigi', age: 2})
+
+    // Reactive does not require .value 
+    const updateNinjaTwo = () => {
+      ninjaTwo.age = 29
+    }
+
     const handleClick = () => {
       // console.log(p, p.value)
       // p.value.classList.add('test')
@@ -35,7 +57,22 @@ export default {
       age.value = 27
     }
 
-    //if these are changed, it won't change the data in the template (non-reactive value)
+
+    //Computed values 
+    // const company = computed(() => 'Deloitte')
+
+    const companies = ref(['Deloitte', 'HKT', 'Manulife', 'Morgan Stanley'])
+    const search = ref('')
+    const matchingCompanies = computed(() => companies.value.filter((c) => c.includes(search.value)))
+
+    // Variable specific update() hook 
+    watch(search, () => {
+      console.log('watch function ran')
+    })
+    
+    watchEffect(() => {
+      console.log('watchEffect function ran', search.value)
+    })
 
     //return anything we want to use in the template 
     // return {
@@ -46,7 +83,12 @@ export default {
       name, 
       age,
       handleClick,
-      p
+      p, 
+      ninjaTwo, 
+      updateNinjaTwo, 
+      companies, 
+      search, 
+      matchingCompanies
     }
   }, 
   created() {
